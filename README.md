@@ -3,8 +3,41 @@
 Serving [MiniMaxAI/MiniMax-M3.1-Flash](https://huggingface.co/MiniMaxAI/MiniMax-M3.1-Flash) across four
 DGX Spark (GB10, sm_121) systems with tensor parallel 4 over ConnectX-7 RoCE.
 
-**Status: work in progress, nothing serves yet.** Numbers appear here only after they are measured on the
-fleet; every change comes with its A/B and its quality checks.
+**Status: serving, first measured bring-up (2026-10-23).** MiniMax's own weights, unchanged, on the
+day-0 vLLM image with the bundled DSpark draft. Speed levers follow one at a time, each with its A/B; quality
+checks (needle retrieval, qeval, T > 0 scan) are next.
+
+## Speed
+
+Measured 2026-10-23 on one fresh boot, host memory compacted first, GPU clock capped at 2200 MHz.
+Profile: `scripts/launch.sh` as below (DSpark k=3, fp8 KV cache, Triton sparse attention, Marlin experts),
+model defaults (thinking on).
+
+### sparkDash 1.8.8
+
+256 new tokens, temperature 0. Decode, aggregate tok/s (per stream in brackets):
+
+| prompt type | c1 | c2 | c4 | c8 | c16 |
+|---|---:|---:|---:|---:|---:|
+| prose | **39.7** | 63.6 (32.6) | 94.2 (24.4) | 147.0 (19.5) | 166.0 (11.0) |
+| code | 46.3 | 66.7 (33.8) | 95.1 (25.3) | 118.7 (16.8) | 148.6 (10.3) |
+| structured | 62.2 | 90.7 (47.1) | 128.5 (34.3) | 194.1 (27.0) | 260.6 (17.2) |
+| json | 45.3 | 71.6 (36.1) | 100.4 (26.2) | 141.9 (18.8) | 172.0 (11.5) |
+
+Two discarded prose c1 warm-ups; c1 is the median of three runs (prose 37.7 / 42.3 / 39.7), c4 the median
+of two, c2 / c8 / c16 one run each.
+
+### speedbench
+
+[speedbench](https://github.com/knapcio/speedbench) 0.3 (`6733653`), **quick mode** (30 frozen prompts x 160
+tokens, c1, temperature 0; a screening run, the full 73-prompt run follows). Decode tok/s, geometric mean:
+
+| prose | code | structured | agentic | multilingual | long context | all 30 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 32.3 | 40.1 | 44.9 | 42.2 | 31.9 | 47.5 | **38.4** |
+
+30 of 30 prompts valid, none failed; median time to first token 406 ms. DSpark mean acceptance length
+~2.1 tokens per step on prose (k=3). Raw results: `results/20261023-dspark3/`.
 
 ## The model
 

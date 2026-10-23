@@ -32,7 +32,8 @@ for r in 0 1 2 3; do
        -e TORCHINDUCTOR_CACHE_DIR=/cache/inductor ${EXTRA_ENV:-})
   args=(serve /models/MiniMax-M3.1-Flash --served-model-name minimax-m3.1-flash --trust-remote-code
         -tp 4 --nnodes 4 --node-rank $r --master-addr ${IPS[0]} --port $PORT --host 0.0.0.0
-        --reasoning-parser minimax_m3 --block-size 128 --disable-hybrid-kv-cache-manager
+        --reasoning-parser minimax_m3 --enable-auto-tool-choice --tool-call-parser minimax_m3
+        --block-size 128 --disable-hybrid-kv-cache-manager
         --gpu-memory-utilization ${GPU_UTIL:-0.80} --max-num-seqs ${MAX_SEQS:-16}
         --max-model-len ${MAX_LEN:-262144})
   [[ -n $SPEC ]] && args+=(--speculative-config "$SPEC")
