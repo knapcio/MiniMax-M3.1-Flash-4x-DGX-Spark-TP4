@@ -28,6 +28,29 @@ Four DGX Spark, one ConnectX-7 port each through a MikroTik CRS812 switch (RoCE)
 Ethernet. 252 GB / 4 ranks = ~63 GB of weights per node, which leaves room for KV cache and CUDA graphs on
 GB10's ~121 GiB of unified memory.
 
+## Running it
+
+Requirements on every node: the weights at the same path (`~/mm31-models/MiniMax-M3.1-Flash`, revision
+`54e4e69`, sha256-verified), NCCL 2.30.7 at `~/nccl-2.30.7`, the image `vllm/vllm-openai:minimax-m31-flash`
+(MiniMax's day-0 vLLM build, arm64), passwordless ssh from the head to the workers over the fabric.
+
+```bash
+# on the head (rank 0); workers are reached over the CX-7 fabric
+SPEC='{"method":"dspark","num_speculative_tokens":3,"attention_backend":"FLASH_ATTN","kv_cache_dtype":"bfloat16"}' \
+  scripts/launch.sh up --kv-cache-dtype fp8 --attention-config '{"indexer_kv_dtype":"fp8"}' \
+  --language-model-only --distributed-executor-backend mp --disable-custom-all-reduce
+scripts/launch.sh down
+```
+
+What differs from the B200/B300 recipe and why (GB10 is sm_121, not SM100):
+
+| upstream default | here | reason |
+|---|---|---|
+| `--kv-cache-dtype nvfp4`, NVFP4 indexer cache | `fp8` for both | NVFP4 KV needs the SM100 MSA backend; vLLM raises on other GPUs |
+| DSpark draft attention `FLASHINFER_TS` | `FLASH_ATTN` | `FLASHINFER_TS` accepts compute capability 10.x only |
+| sparse attention / indexer: MSA kernels | Triton path (automatic) | the MSA kernels are SM100-only; vLLM selects the generic path by itself |
+| routed experts: SM100 NVFP4 kernels | Marlin W4A16 (automatic) | per-token NVFP4 activations are supported only by SM100 kernels |
+
 ## Plan
 
 1. Bring-up on upstream vLLM / SGLang with MiniMax's own weights, unchanged.
