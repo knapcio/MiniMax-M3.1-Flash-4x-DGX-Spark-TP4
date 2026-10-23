@@ -13,6 +13,17 @@ Measured 2026-10-23 on one fresh boot, host memory compacted first, GPU clock ca
 Profile: `scripts/launch.sh` as below (DSpark k=3, fp8 KV cache, Triton sparse attention, Marlin experts),
 model defaults (thinking on).
 
+### speedbench
+
+[speedbench](https://github.com/knapcio/speedbench) 0.3 (`6733653`), **quick mode** (30 frozen prompts x 160
+tokens, c1, temperature 0; a screening run, the full 73-prompt run follows). Decode tok/s, geometric mean:
+
+| prose | code | structured | agentic | multilingual | long context | all 30 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 32.3 | 40.1 | 44.9 | 42.2 | 31.9 | 47.5 | **38.4** |
+
+30 of 30 prompts valid, none failed; median time to first token 406 ms.
+
 ### sparkDash 1.8.8
 
 256 new tokens, temperature 0. Decode, aggregate tok/s (per stream in brackets):
@@ -26,17 +37,6 @@ model defaults (thinking on).
 
 Two discarded prose c1 warm-ups; c1 is the median of three runs (prose 37.7 / 42.3 / 39.7), c4 the median
 of two, c2 / c8 / c16 one run each.
-
-### speedbench
-
-[speedbench](https://github.com/knapcio/speedbench) 0.3 (`6733653`), **quick mode** (30 frozen prompts x 160
-tokens, c1, temperature 0; a screening run, the full 73-prompt run follows). Decode tok/s, geometric mean:
-
-| prose | code | structured | agentic | multilingual | long context | all 30 |
-|---:|---:|---:|---:|---:|---:|---:|
-| 32.3 | 40.1 | 44.9 | 42.2 | 31.9 | 47.5 | **38.4** |
-
-30 of 30 prompts valid, none failed; median time to first token 406 ms.
 
 ### Quality checks (same boot)
 
