@@ -1,0 +1,3 @@
+{"probe": "needle", "ktok": 128, "prompt_tokens": 116222, "seconds": 81.52, "pass": true, "answer": "DAHYWGMEEH", "ts": "2026-10-23 13:27:10", "label": ""}
+{"probe": "needle", "ktok": 240, "prompt_tokens": 217720, "seconds": 158.6, "pass": true, "answer": "JNXSJNDMXI", "ts": "2026-10-23 13:29:49", "label": ""}
+{"probe": "cold", "ktok": 240, "prompt_tokens": 217707, "cached": 0, "seconds": 157.27, "prefill_tok_s": 1384.3, "ts": "2026-10-23 13:32:26", "label": ""}

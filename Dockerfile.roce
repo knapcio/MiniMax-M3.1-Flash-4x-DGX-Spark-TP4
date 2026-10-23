@@ -1,0 +1,55 @@
+# MiniMax-M3.1-Flash vLLM image + RoCEnante one-shot collectives, opt-in (MM31_ROCE_ALLREDUCE=1).
+#
+# Optional: scripts/launch.sh does NOT need this image. With MM31_ROCE_ALLREDUCE=1 it mounts roce/ into
+# the stock image and builds the RDMA proxy once per node into ~/mm31-cache/b12x-roce, so both A/B arms
+# run the same image. Build this only for a launcher that cannot mount files or pass env.
+#
+# Adds, on top of the stock image and without editing any vLLM or FlashInfer file:
+#   /opt/mm31-roce/mm31_roce       the shim (port of local-inference-lab/vllm#597 via tonyd2wild's port and
+#                                  our GLM-5.3 recipe), applied as import-time wrappers
+#   <site-packages>/mm31_roce.pth  imports mm31_roce.boot in every Python process; a no-op unless
+#                                  MM31_ROCE_ALLREDUCE=1
+#   the image's own RDMA proxy (FlashInfer 0.7.2 experimental/b12x comm/roce/_roce_proxy.c, plain C over
+#   libibverbs) compiled in a builder stage; the runtime itself is the image's b12x, not a vendored copy.
+#
+# Build from the repository root on each node (no CUDA compile; apt for gcc in the builder stage only,
+# one C file, then the CPU preflight; about 2-4 min on a Spark with the base image present):
+#   docker build -f Dockerfile.roce -t mm31-roce:minimax-m31-flash .
+# Knobs: --build-arg BASE_IMAGE=...  --build-arg ROCE_DEFAULT=1 (bake MM31_ROCE_ALLREDUCE=1 in)
+#        --build-arg ROCE_HCA=rocep1s0f0 (single rail)  --build-arg RUN_TESTS=0
+ARG BASE_IMAGE=vllm/vllm-openai:minimax-m31-flash
+
+# Stage 1: compile the image's RDMA proxy. Any apt install happens here only.
+FROM ${BASE_IMAGE} AS proxy
+RUN set -eu; \
+    if command -v gcc >/dev/null && [ -f /usr/include/infiniband/verbs.h ]; then echo "gcc + verbs.h present"; else \
+      apt-get update; apt-get install -y --no-install-recommends gcc libc6-dev libibverbs-dev; fi; \
+    B12X_ROCE_CACHE_DIR=/proxy-cache python3 -c "from b12x.comm.roce import _proxy; print('proxy', _proxy._build())"
+
+# Stage 2: the serving image.
+FROM ${BASE_IMAGE}
+
+ARG ROCE_DEFAULT=0
+ARG ROCE_HCA=rocep1s0f0,roceP2p1s0f0
+ARG ROCE_SPIN_LIMIT=300000000
+ARG RUN_TESTS=1
+
+COPY roce/mm31_roce /opt/mm31-roce/mm31_roce
+COPY roce/tests /opt/mm31-roce/tests
+COPY roce/mm31_roce.pth /opt/mm31-roce/mm31_roce.pth
+# Install the .pth next to vllm, i.e. in a directory site.py processes.
+RUN python3 -c "import importlib.util as u, os, shutil; d = os.path.dirname(os.path.dirname(u.find_spec('vllm').origin)); shutil.copy('/opt/mm31-roce/mm31_roce.pth', d); print('mm31_roce.pth ->', d)"
+
+# Runtime defaults (docker run -e overrides any of them). Spin limit 300M polls (~5 min, tonyd2wild's
+# value): vLLM's eager profile/warm-up can JIT on one rank while its peers wait inside a RoCE kernel.
+ENV MM31_ROCE_ALLREDUCE=${ROCE_DEFAULT} \
+    B12X_ROCE_HCA=${ROCE_HCA} \
+    B12X_ROCE_SPIN_LIMIT=${ROCE_SPIN_LIMIT} \
+    B12X_ROCE_CACHE_DIR=/opt/mm31-roce/proxy-cache
+
+COPY --from=proxy /proxy-cache /opt/mm31-roce/proxy-cache
+RUN chmod -R a+rX /opt/mm31-roce
+
+RUN if [ "$RUN_TESTS" = 1 ]; then cd /opt/mm31-roce \
+ && env -u MM31_ROCE_ALLREDUCE CUDA_VISIBLE_DEVICES= python3 tests/test_mm31_roce_cpu.py \
+ && env -u MM31_ROCE_ALLREDUCE CUDA_VISIBLE_DEVICES= python3 tests/test_mm31_roce_image.py; fi

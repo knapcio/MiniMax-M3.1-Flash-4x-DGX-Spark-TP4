@@ -1,0 +1,15 @@
+MM31_SGL_GB10: patched sglang.srt.arg_groups.model_overrides.minimax_m3 (draft-attn-triton, native-branch-sm100, generic-attn-triton)
+MM31_SGL_GB10: patched sglang.srt.layers.quantization.minimax_m3_nvfp4 (moe-marlin-off-sm100)
+MM31_SGL_GB10: patched sglang.srt.configs.model_config (native-stack-sm100)
+MM31_SGL_GB10: patched sglang.srt.arg_groups.model_overrides.minimax_m3 (draft-attn-triton, native-branch-sm100, generic-attn-triton)
+MM31_SGL_GB10: patched sglang.srt.arg_groups.model_overrides.minimax_m3 (draft-attn-triton, native-branch-sm100, generic-attn-triton)
+MM31_SGL_GB10: patched sglang.srt.layers.quantization.minimax_m3_nvfp4 (moe-marlin-off-sm100)
+MM31_SGL_GB10: patched sglang.srt.configs.model_config (native-stack-sm100)
+MM31_SGL_GB10: patched sglang.srt.layers.quantization.minimax_m3_nvfp4 (moe-marlin-off-sm100)
+MM31_SGL_GB10: patched sglang.srt.configs.model_config (native-stack-sm100)
+[2026-10-23 10:52:36 TP0] MM31_ROCE_READY rank=0 world=4 api=plan hcas=rocep1s0f0,roceP2p1s0f0 all_reduce_max=4194304 all_gather_max=16777216 spin_limit=300000000 {"bytes_posted_per_hca": [624, 624], "ctrl_seq": 3, "epoch": 3, "error_hca": 0, "error_peer": 0, "error_seq": 0, "hcas": ["rocep1s0f0", "roceP2p1s0f0"], "last_seq": 3, "max_gather_bytes": 16777216, "max_size": 4194304, "ops_posted": 3, "rails": 2, "rank": 0, "routes": [[], [[0, 0], [1, 1]], [[0, 0], [1, 1]], [[0, 0], [1, 1]]], "slot_bytes": 16777216, "spin_limit": 300000000, "world_size": 4, "writes_completed": 18, "writes_completed_per_hca": [9, 9]}
+MM31_SGL_GB10: patched sglang.kernels.ops.speculative.dspark.dspark_accept (dspark-softmax-clamp)
+MM31_SGL_GB10: patched sglang.srt.layers.attention.minimax_sparse_backend (linear-verify-flag, lv-chain-only-guard, lv-topk-buf, lv-capture-seqlen, lv-seqlen-k, lv-meta-in-graph, lv-forward)
+[2026-10-23 10:58:05 TP0] MM31_ROCE_ROUTE all_reduce rank=0 first=983040 bytes (bfloat16); NCCL above 4194304 bytes
+  0%|          | 0/12 [00:00<?, ?it/s]Capturing batches (bs=16 avail_mem=13.91 GB):   0%|          | 0/12 [00:00<?, ?it/s][2026-10-23 11:02:24 TP0] MM31_ROCE_ROUTE all_gather rank=0 first shard=(80, 50016) bfloat16 dim=0
+[2026-10-23 11:03:11 TP0] MM31_ROCE_HEALTH rank=0 first guarded step ok

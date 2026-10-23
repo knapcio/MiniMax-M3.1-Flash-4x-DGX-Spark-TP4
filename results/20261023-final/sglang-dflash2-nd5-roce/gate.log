@@ -1,0 +1,5 @@
+[gate 13:27:10] needle 128: {"probe": "needle", "ktok": 128, "prompt_tokens": 116222, "seconds": 81.52, "pass": true, "answer": "DAHYWGMEEH", "ts": "2026-10-23 13:27:10", "label": ""}
+[gate 13:29:49] needle 240: {"probe": "needle", "ktok": 240, "prompt_tokens": 217720, "seconds": 158.6, "pass": true, "answer": "JNXSJNDMXI", "ts": "2026-10-23 13:29:49", "label": ""}
+[gate 13:32:26] cold 240: {"probe": "cold", "ktok": 240, "prompt_tokens": 217707, "cached": 0, "seconds": 157.27, "prefill_tok_s": 1384.3, "ts": "2026-10-23 13:32:26", "label": ""}
+[gate 13:43:30] qeval: 73/75 passed (97.3%), 1 hit the token cap, wall 11.1 min, median 56.56 tok/s    code     24/25    format    7/7    json      8/8    math     14/14    prose     4/5    reason   16/16 wrote qeval-final-sgl-dflash2rx-nd5-roce.json 
+[gate 13:43:30] DONE

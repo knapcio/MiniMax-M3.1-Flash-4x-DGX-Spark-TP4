@@ -1,0 +1,18 @@
+MiniMax-M3.1-Flash on four DGX Sparks (TP4)
+
+Repository-authored launch scripts, tests and documentation: MIT, see LICENSE.
+
+Apache-2.0 portions (full licence text in LICENSES/Apache-2.0.txt), each marked in its file header:
+- roce/mm31_roce/: adapted from vLLM (vllm-project/vllm, Apache-2.0) distributed-communication hooks
+  and from the RoCEnante one-shot RDMA all-reduce by Local Inference Lab (Luke Alonso, Jason Cook),
+  as shipped in FlashInfer's b12x package (Apache-2.0); first adapted for GLM-5.3 TP4 in our
+  GLM recipe. The RoCEnante code itself is not vendored here; it is used from the FlashInfer build
+  inside the serving image.
+- overlay/: b12x paged sparse-attention binding for vLLM's MiniMax-M3 path (uses FlashInfer's
+  experimental b12x, Apache-2.0); overlay/gb10check/mm31_triton_kernels.py contains Triton kernels
+  extracted from vLLM (Apache-2.0) for static compile checks.
+- sglang/: import-time patches to SGLang (sgl-project/sglang, Apache-2.0) source and the RoCEnante
+  hook for SGLang's TP group (shares roce/mm31_roce).
+
+No model weights or container images are distributed. The MiniMax-M3.1-Flash weights are under the
+MiniMax Community License.

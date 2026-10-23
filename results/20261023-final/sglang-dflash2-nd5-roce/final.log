@@ -1,0 +1,10 @@
+[final 12:50:10] spec= roce=1 draft=dflash2 nd=5 extra= args=
+[final 13:03:16] up in 686 s
+[final 13:11:17] speedbench "ALL": {"n": 73, "median_tok_s": 44.77, "geomean_tok_s": 45.5, "aggregate_tok_s": 44.25, "median_ttft_ms": 326.9, "truncated_frac": 0.918, "reasoning_token_frac
+[final 13:25:49] sparkdash done rc=0
+[gate 13:27:10] needle 128: {"probe": "needle", "ktok": 128, "prompt_tokens": 116222, "seconds": 81.52, "pass": true, "answer": "DAHYWGMEEH", "ts": "2026-10-23 13:27:10", "label": ""}
+[gate 13:29:49] needle 240: {"probe": "needle", "ktok": 240, "prompt_tokens": 217720, "seconds": 158.6, "pass": true, "answer": "JNXSJNDMXI", "ts": "2026-10-23 13:29:49", "label": ""}
+[gate 13:32:26] cold 240: {"probe": "cold", "ktok": 240, "prompt_tokens": 217707, "cached": 0, "seconds": 157.27, "prefill_tok_s": 1384.3, "ts": "2026-10-23 13:32:26", "label": ""}
+[gate 13:43:30] qeval: 73/75 passed (97.3%), 1 hit the token cap, wall 11.1 min, median 56.56 tok/s    code     24/25    format    7/7    json      8/8    math     14/14    prose     4/5    reason   16/16 wrote qeval-final-sgl-dflash2rx-nd5-roce.json 
+[gate 13:43:30] DONE
+[final 13:43:30] DONE
