@@ -1,0 +1,5 @@
+[gate 09:05:36] needle 128: {"probe": "needle", "ktok": 128, "prompt_tokens": 116221, "seconds": 62.09, "pass": true, "answer": "DSSKJSEEPB", "ts": "2026-10-23 09:05:36", "label": ""}
+[gate 09:07:36] needle 240: {"probe": "needle", "ktok": 240, "prompt_tokens": 217719, "seconds": 120.08, "pass": true, "answer": "DIZKSGZBYF", "ts": "2026-10-23 09:07:36", "label": ""}
+[gate 09:09:32] cold 240: {"probe": "cold", "ktok": 240, "prompt_tokens": 217699, "cached": 0, "seconds": 116.15, "prefill_tok_s": 1874.3, "ts": "2026-10-23 09:09:32", "label": ""}
+[gate 09:21:42] qeval: 74/75 passed (98.7%), 0 hit the token cap, wall 12.2 min, median 45.21 tok/s    code     24/25    format    7/7    json      8/8    math     14/14    prose     5/5    reason   16/16 wrote qeval-dspark3.json 
+[gate 09:21:42] DONE

@@ -4,8 +4,8 @@ Serving [MiniMaxAI/MiniMax-M3.1-Flash](https://huggingface.co/MiniMaxAI/MiniMax-
 DGX Spark (GB10, sm_121) systems with tensor parallel 4 over ConnectX-7 RoCE.
 
 **Status: serving, first measured bring-up (2026-10-23).** MiniMax's own weights, unchanged, on the
-day-0 vLLM image with the bundled DSpark draft. Speed levers follow one at a time, each with its A/B; quality
-checks (needle retrieval, qeval, T > 0 scan) are next.
+day-0 vLLM image with the bundled DSpark draft. Speed levers follow one at a time, each with its A/B and the
+same quality checks.
 
 ## Speed
 
@@ -36,7 +36,17 @@ tokens, c1, temperature 0; a screening run, the full 73-prompt run follows). Dec
 |---:|---:|---:|---:|---:|---:|---:|
 | 32.3 | 40.1 | 44.9 | 42.2 | 31.9 | 47.5 | **38.4** |
 
-30 of 30 prompts valid, none failed; median time to first token 406 ms. DSpark mean acceptance length
+30 of 30 prompts valid, none failed; median time to first token 406 ms.
+
+### Quality checks (same boot)
+
+- qeval (75 tasks, T = 0): **74 / 75** (code 24/25, format 7/7, json 8/8, math 14/14, prose 5/5, reason 16/16).
+  M3.1's chat template always runs adaptive thinking, so every task ran with thinking and each task's token
+  limit was raised by 8,192 to leave room for it; no answer hit the cap.
+- Needle retrieval (passphrase at 50 % depth): PASS at 116K and 218K tokens.
+- Cold prefill of a 218K-token prompt: 116 s, **1,874 tok/s**.
+
+Logs: `results/20261023-dspark3/gate/`. DSpark mean acceptance length
 ~2.1 tokens per step on prose (k=3). Raw results: `results/20261023-dspark3/`.
 
 ## The model
